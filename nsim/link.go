@@ -28,3 +28,8 @@ func (node *Node) LinkReceive(frame Frame) bool {
 	}
 	return false
 }
+
+// LinkSend sends a frame to the transmission medium.
+func (node *Node) LinkSend(frame Frame) error {
+	return node.Medium.send(frame)
+}

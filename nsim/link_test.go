@@ -29,3 +29,22 @@ func TestAcceptFrameIfTargetWithMultipleIPs(t *testing.T) {
 		t.Error("Frame must be accepted.")
 	}
 }
+
+type mockMedium struct {
+	acceptedFrame *Frame
+}
+
+func (m *mockMedium) send(frame Frame) error {
+	m.acceptedFrame = &frame
+	return nil
+}
+
+func TestLinkSend(t *testing.T) {
+	medium := &mockMedium{nil}
+	node, _ := NewNodeBuilder().AddNetInterface("192.168.0.10").WithMedium(medium).Build()
+	frame := Frame{"192.168.0.10"}
+	node.LinkSend(frame)
+	if *medium.acceptedFrame != frame {
+		t.Error("Frame was not sent to the medium.")
+	}
+}
