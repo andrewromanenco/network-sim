@@ -7,6 +7,7 @@ import (
 // Node is a model of a computer in the Internet.
 type Node struct {
 	NetworkInterfaces []NetworkInterface
+	Medium            TransmissionMedium
 }
 
 // NetworkInterface is a model for a network card.

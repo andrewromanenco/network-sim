@@ -6,6 +6,11 @@ package nsim
 
 import "net"
 
+// TransmissionMedium is an abstraction for sending frames between nodes.
+type TransmissionMedium interface {
+	send(frame Frame) error
+}
+
 // Frame is a model to simulate link layer in TCP/IP stack.
 type Frame struct {
 	destinationID string

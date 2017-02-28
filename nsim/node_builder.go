@@ -11,21 +11,31 @@ var (
 
 	//ErrNetworkInterfacesBadIP means that at least on IP config for interfaces is not a valid one.
 	ErrNetworkInterfacesBadIP = errors.New("Invalid IP address for an interface is provided.")
+
+	//ErrNoTransmissionMedium means that medium was not provided.
+	ErrNoTransmissionMedium = errors.New("No transmission medium is provided.")
 )
 
 // NodeBuilder builds a node.
 type NodeBuilder struct {
 	networkInterfaces []string
+	medium            TransmissionMedium
 }
 
 // NewNodeBuilder creates new NodeBuilder.
 func NewNodeBuilder() *NodeBuilder {
-	return &NodeBuilder{make([]string, 0)}
+	return &NodeBuilder{make([]string, 0), nil}
 }
 
 // AddNetInterface adds network interface to the node under construction.
 func (nb *NodeBuilder) AddNetInterface(ip string) *NodeBuilder {
 	nb.networkInterfaces = append(nb.networkInterfaces, ip)
+	return nb
+}
+
+// WithMedium sets medium to be used for data exchange.
+func (nb *NodeBuilder) WithMedium(medium TransmissionMedium) *NodeBuilder {
+	nb.medium = medium
 	return nb
 }
 
@@ -42,5 +52,8 @@ func (nb *NodeBuilder) Build() (*Node, error) {
 		}
 		networkInterfaces = append(networkInterfaces, NetworkInterface{parsedIP})
 	}
-	return &Node{networkInterfaces}, nil
+	if nb.medium == nil {
+		return nil, ErrNoTransmissionMedium
+	}
+	return &Node{networkInterfaces, nb.medium}, nil
 }
