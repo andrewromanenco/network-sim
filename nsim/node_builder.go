@@ -10,7 +10,7 @@ var (
 	ErrNoNetworkInterfaces = errors.New("No network interfaces provided. At least one is required.")
 
 	//ErrNetworkInterfacesBadIP means that at least on IP config for interfaces is not a valid one.
-	ErrNetworkInterfacesBadIP = errors.New("Invalid IP address for an interface is provided.")
+	ErrNetworkInterfacesBadIP = errors.New("Provide IP/Mask as CIDR.")
 
 	//ErrNoTransmissionMedium means that medium was not provided.
 	ErrNoTransmissionMedium = errors.New("No transmission medium is provided.")
@@ -46,11 +46,11 @@ func (nb *NodeBuilder) Build() (*Node, error) {
 	}
 	var networkInterfaces []NetworkInterface
 	for _, ip := range nb.networkInterfaces {
-		parsedIP := net.ParseIP(ip)
-		if parsedIP == nil {
+		interfaceIP, interfaceNet, err := net.ParseCIDR(ip)
+		if err != nil {
 			return nil, ErrNetworkInterfacesBadIP
 		}
-		networkInterfaces = append(networkInterfaces, NetworkInterface{parsedIP})
+		networkInterfaces = append(networkInterfaces, NetworkInterface{interfaceIP, *interfaceNet})
 	}
 	if nb.medium == nil {
 		return nil, ErrNoTransmissionMedium

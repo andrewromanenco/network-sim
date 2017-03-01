@@ -18,10 +18,18 @@ func TestNodeBuilderFailsIfNetInterfacesWithInvalidIP(t *testing.T) {
 	}
 }
 
+func TestNodeBuilderFailsIfNetInterfacesJustAnIP(t *testing.T) {
+	testee := NewNodeBuilder()
+	_, err := testee.AddNetInterface("192.168.0.1").Build()
+	if err != ErrNetworkInterfacesBadIP {
+		t.Error("Must fail if only IP is provided for an interface.")
+	}
+}
+
 func TestNodeBuilderFailsIfNoMediumIsProvided(t *testing.T) {
 	testee := NewNodeBuilder()
 	_, err := testee.
-		AddNetInterface("192.168.0.1").
+		AddNetInterface("192.168.0.1/24").
 		Build()
 	if err != ErrNoTransmissionMedium {
 		t.Error("Error is expected when no medium is provided.")
@@ -31,8 +39,8 @@ func TestNodeBuilderFailsIfNoMediumIsProvided(t *testing.T) {
 func TestNodeBuilder(t *testing.T) {
 	testee := NewNodeBuilder()
 	node, err := testee.
-		AddNetInterface("192.168.0.1").
-		AddNetInterface("192.168.0.2").
+		AddNetInterface("192.168.1.1/24").
+		AddNetInterface("192.168.2.2/24").
 		WithMedium(&dummyMedium{}).
 		Build()
 	if err != nil {
@@ -41,11 +49,23 @@ func TestNodeBuilder(t *testing.T) {
 	if len(node.NetworkInterfaces) != 2 {
 		t.Error("Node must have two network interfaces")
 	}
-	if node.NetworkInterfaces[0].IP.String() != "192.168.0.1" {
+	if node.NetworkInterfaces[0].IP.String() != "192.168.1.1" {
 		t.Error("First IP does not match the provided config.")
 	}
-	if node.NetworkInterfaces[1].IP.String() != "192.168.0.2" {
+	if node.NetworkInterfaces[0].Network.IP.String() != "192.168.1.0" {
+		t.Error("First IP network does not match to the provided config.")
+	}
+	if size, _ := node.NetworkInterfaces[0].Network.Mask.Size(); size != 24 {
+		t.Error("First Mask does not match to the provided config.")
+	}
+	if node.NetworkInterfaces[1].IP.String() != "192.168.2.2" {
 		t.Error("Second IP does not match the provided config.")
+	}
+	if node.NetworkInterfaces[1].Network.IP.String() != "192.168.2.0" {
+		t.Error("Second IP network does not match to the provided config.")
+	}
+	if size, _ := node.NetworkInterfaces[1].Network.Mask.Size(); size != 24 {
+		t.Error("Second Mask does not match to the provided config.")
 	}
 	if node.Medium == nil {
 		t.Error("Medium was not set.")

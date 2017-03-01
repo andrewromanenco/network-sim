@@ -12,5 +12,6 @@ type Node struct {
 
 // NetworkInterface is a model for a network card.
 type NetworkInterface struct {
-	IP net.IP
+	IP      net.IP
+	Network net.IPNet
 }

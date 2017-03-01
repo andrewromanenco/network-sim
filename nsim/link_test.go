@@ -3,7 +3,7 @@ package nsim
 import "testing"
 
 func TestDropFrameIfNotATarget(t *testing.T) {
-	node, _ := NewNodeBuilder().AddNetInterface("192.168.0.10").WithMedium(&dummyMedium{}).Build()
+	node, _ := NewNodeBuilder().AddNetInterface("192.168.0.10/24").WithMedium(&dummyMedium{}).Build()
 	frame := Frame{"192.168.100.100"}
 	if node.LinkReceive(frame) {
 		t.Error("Frame with other destination must be declined.")
@@ -11,7 +11,7 @@ func TestDropFrameIfNotATarget(t *testing.T) {
 }
 
 func TestAcceptFrameIfTarget(t *testing.T) {
-	node, _ := NewNodeBuilder().AddNetInterface("192.168.0.10").WithMedium(&dummyMedium{}).Build()
+	node, _ := NewNodeBuilder().AddNetInterface("192.168.0.10/24").WithMedium(&dummyMedium{}).Build()
 	frame := Frame{"192.168.0.10"}
 	if !node.LinkReceive(frame) {
 		t.Error("Frame must be accepted.")
@@ -20,8 +20,8 @@ func TestAcceptFrameIfTarget(t *testing.T) {
 
 func TestAcceptFrameIfTargetWithMultipleIPs(t *testing.T) {
 	node, _ := NewNodeBuilder().
-		AddNetInterface("192.168.0.10").
-		AddNetInterface("192.168.1.10").
+		AddNetInterface("192.168.0.10/24").
+		AddNetInterface("192.168.1.10/24").
 		WithMedium(&dummyMedium{}).
 		Build()
 	frame := Frame{"192.168.0.10"}
@@ -41,7 +41,7 @@ func (m *mockMedium) send(frame Frame) error {
 
 func TestLinkSend(t *testing.T) {
 	medium := &mockMedium{nil}
-	node, _ := NewNodeBuilder().AddNetInterface("192.168.0.10").WithMedium(medium).Build()
+	node, _ := NewNodeBuilder().AddNetInterface("192.168.0.10/24").WithMedium(medium).Build()
 	frame := Frame{"192.168.0.10"}
 	node.LinkSend(frame)
 	if *medium.acceptedFrame != frame {
