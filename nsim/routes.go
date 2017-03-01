@@ -3,6 +3,7 @@ package nsim
 import (
 	"errors"
 	"net"
+	"sort"
 )
 
 var (
@@ -24,5 +25,20 @@ func (node *Node) AddRoute(cidrNet string, destinationIP string) error {
 		return ErrRouteInvalidCIDR
 	}
 	node.RoutingTable = append(node.RoutingTable, Route{ip, *network})
+	sortRoutesByMaskDesc(node.RoutingTable)
 	return nil
+}
+
+type byMask []Route
+
+func (rt byMask) Len() int      { return len(rt) }
+func (rt byMask) Swap(i, j int) { rt[i], rt[j] = rt[j], rt[i] }
+func (rt byMask) Less(i, j int) bool {
+	iSize, _ := rt[i].Network.Mask.Size()
+	jSize, _ := rt[j].Network.Mask.Size()
+	return iSize > jSize
+}
+
+func sortRoutesByMaskDesc(routes []Route) {
+	sort.Sort(byMask(routes))
 }
