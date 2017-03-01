@@ -55,5 +55,5 @@ func (nb *NodeBuilder) Build() (*Node, error) {
 	if nb.medium == nil {
 		return nil, ErrNoTransmissionMedium
 	}
-	return &Node{networkInterfaces, nb.medium}, nil
+	return &Node{networkInterfaces, nb.medium, nil}, nil
 }

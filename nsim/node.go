@@ -8,10 +8,17 @@ import (
 type Node struct {
 	NetworkInterfaces []NetworkInterface
 	Medium            TransmissionMedium
+	RoutingTable      []Route
 }
 
 // NetworkInterface is a model for a network card.
 type NetworkInterface struct {
 	IP      net.IP
 	Network net.IPNet
+}
+
+// Route is a route to a specific network.
+type Route struct {
+	DestinationIP net.IP
+	Network       net.IPNet
 }
