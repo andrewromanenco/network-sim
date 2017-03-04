@@ -14,6 +14,7 @@ type TransmissionMedium interface {
 // Frame is a model to simulate link layer in TCP/IP stack.
 type Frame struct {
 	destinationID string
+	IPPacket      IPPacket
 }
 
 // LinkReceive is called when a node has an incoming frame. The receiver may
