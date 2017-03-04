@@ -38,3 +38,12 @@ func TestARPReturnsNothingForNonExistingRoute(t *testing.T) {
 		t.Error("Resolution must fail for non existing route.")
 	}
 }
+
+func testARPPicksMostSpecificRoute(t *testing.T) {
+	node := testARPNode()
+	node.AddRoute("192.168.3.0/28", "192.168.1.200")
+	mac := node.ARP(net.ParseIP("192.168.3.33"))
+	if mac != "192.168.1.200" {
+		t.Error("Most specific route must be used.")
+	}
+}
