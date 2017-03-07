@@ -18,9 +18,11 @@ type IPPacket struct {
 	Protocol    string
 }
 
+var fARP = ARP
+
 // IPSend sends an IP packet.
 func (node *Node) IPSend(packet IPPacket) error {
-	destinationMAC := ARP(node, &packet.Destination)
+	destinationMAC := fARP(node, &packet.Destination)
 	frame := Frame{destinationMAC, packet}
 	node.LinkSend(frame)
 	return nil
