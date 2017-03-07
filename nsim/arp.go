@@ -2,9 +2,6 @@ package nsim
 
 import "net"
 
-// ARPProto is a function type for an arp protocol implementaion.
-type ARPProto func(node *Node, ip *net.IP)
-
 // ARP resolves an IP to link layer identifier. The result is either a host in the
 // same network as on of node's interfaces, or destination ID of a router. Or nothing.
 // If router is not in the same network as the node, result is nothing.
