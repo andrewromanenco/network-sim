@@ -17,7 +17,8 @@ func testARPNode() *Node {
 
 func TestARPReturnsNetworkInterfaceIPForSameNetwork(t *testing.T) {
 	node := testARPNode()
-	mac := node.ARP(net.ParseIP("192.168.1.99"))
+	ip := net.ParseIP("192.168.1.99")
+	mac := ARP(node, &ip)
 	if mac != "192.168.1.99" {
 		t.Error("MAC must be resolved to same IP as request. Because it's part of network interface network.")
 	}
@@ -25,7 +26,8 @@ func TestARPReturnsNetworkInterfaceIPForSameNetwork(t *testing.T) {
 
 func TestARPReturnsDestinationForExistingRoute(t *testing.T) {
 	node := testARPNode()
-	mac := node.ARP(net.ParseIP("192.168.3.33"))
+	ip := net.ParseIP("192.168.3.33")
+	mac := ARP(node, &ip)
 	if mac != "192.168.1.100" {
 		t.Error("MAC must be resolved to IP of route destination.")
 	}
@@ -33,7 +35,8 @@ func TestARPReturnsDestinationForExistingRoute(t *testing.T) {
 
 func TestARPReturnsNothingForNonExistingRoute(t *testing.T) {
 	node := testARPNode()
-	mac := node.ARP(net.ParseIP("192.168.5.55"))
+	ip := net.ParseIP("192.168.5.55")
+	mac := ARP(node, &ip)
 	if mac != "" {
 		t.Error("Resolution must fail for non existing route.")
 	}
@@ -42,7 +45,8 @@ func TestARPReturnsNothingForNonExistingRoute(t *testing.T) {
 func testARPPicksMostSpecificRoute(t *testing.T) {
 	node := testARPNode()
 	node.AddRoute("192.168.3.0/28", "192.168.1.200")
-	mac := node.ARP(net.ParseIP("192.168.3.33"))
+	ip := net.ParseIP("192.168.3.33")
+	mac := ARP(node, &ip)
 	if mac != "192.168.1.200" {
 		t.Error("Most specific route must be used.")
 	}

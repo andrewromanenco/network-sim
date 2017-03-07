@@ -20,7 +20,7 @@ type IPPacket struct {
 
 // IPSend sends an IP packet.
 func (node *Node) IPSend(packet IPPacket) error {
-	destinationMAC := node.ARP(packet.Destination)
+	destinationMAC := ARP(node, &packet.Destination)
 	frame := Frame{destinationMAC, packet}
 	node.LinkSend(frame)
 	return nil
