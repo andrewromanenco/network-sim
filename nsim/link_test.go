@@ -1,6 +1,9 @@
 package nsim
 
-import "testing"
+import (
+	"net"
+	"testing"
+)
 
 func init() {
 	fIPReceive = func(node *Node, ipPacket IPPacket) {}
@@ -55,5 +58,41 @@ func TestLinkSend(t *testing.T) {
 	}
 	if acceptedFrame.IPPacket.TTL != frame.IPPacket.TTL {
 		t.Error("Seems like IP packet was changed.")
+	}
+}
+
+func TestFrameEqualsForSame(t *testing.T) {
+	frame1 := Frame{"192.168.0.10", IPPacket{}}
+	frame2 := Frame{"192.168.0.10", IPPacket{}}
+	if !frame1.Equals(&frame2) {
+		t.Error("Expected to be same.")
+	}
+}
+
+func TestFrameEqualsFalseForNil(t *testing.T) {
+	frame := Frame{"192.168.0.10", IPPacket{}}
+	if frame.Equals(nil) {
+		t.Error("Nil must be false.")
+	}
+}
+
+func TestFrameEqualsFalseForDiffDestination(t *testing.T) {
+	frame1 := Frame{"192.168.0.10", IPPacket{}}
+	frame2 := Frame{"192.168.0.11", IPPacket{}}
+	if frame1.Equals(&frame2) {
+		t.Error("Expected to be different.")
+	}
+}
+
+func TestFrameEqualsFalseForDiffPacket(t *testing.T) {
+	frame1 := Frame{"192.168.0.10", IPPacket{}}
+	frame2 := Frame{"192.168.0.10", IPPacket{
+		net.ParseIP("127.0.0.1"),
+		net.ParseIP("127.0.0.2"),
+		100,
+		"None",
+	}}
+	if frame1.Equals(&frame2) {
+		t.Error("Expected to be different.")
 	}
 }
