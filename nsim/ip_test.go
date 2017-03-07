@@ -70,3 +70,54 @@ func TestIPSendPacketNoDestinationIPFails(t *testing.T) {
 		t.Error("IPSend must fail if packet has no destination ip.")
 	}
 }
+
+func TestIPPacketEqualsWhenSame(t *testing.T) {
+	packet1 := testIPPacket()
+	packet2 := testIPPacket()
+	if !packet1.Equals(&packet2) {
+		t.Error("Equal packets must be equal.")
+	}
+}
+
+func TestIPPacketEqualsFalseForNil(t *testing.T) {
+	packet1 := testIPPacket()
+	if packet1.Equals(nil) {
+		t.Error("Nil must be false.")
+	}
+}
+
+func TestIPPacketNotEqualsDestination(t *testing.T) {
+	packet1 := testIPPacket()
+	packet2 := testIPPacket()
+	packet2.Destination = net.ParseIP("127.0.0.1")
+	if packet1.Equals(&packet2) {
+		t.Error("Packets are different.")
+	}
+}
+
+func TestIPPacketNotEqualSource(t *testing.T) {
+	packet1 := testIPPacket()
+	packet2 := testIPPacket()
+	packet2.Source = net.ParseIP("127.0.0.1")
+	if packet1.Equals(&packet2) {
+		t.Error("Packets are different.")
+	}
+}
+
+func TestIPPacketNotEqualTTL(t *testing.T) {
+	packet1 := testIPPacket()
+	packet2 := testIPPacket()
+	packet2.TTL = 99
+	if packet1.Equals(&packet2) {
+		t.Error("Packets are different.")
+	}
+}
+
+func TestIPPacketNotEqualProtocol(t *testing.T) {
+	packet1 := testIPPacket()
+	packet2 := testIPPacket()
+	packet2.Protocol = "other"
+	if packet1.Equals(&packet2) {
+		t.Error("Packets are different.")
+	}
+}

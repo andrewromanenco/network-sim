@@ -3,6 +3,7 @@ package nsim
 import (
 	"errors"
 	"net"
+	"reflect"
 )
 
 var (
@@ -19,6 +20,26 @@ type IPPacket struct {
 	Source      net.IP
 	TTL         int
 	Protocol    string
+}
+
+// Equals tests if two packets are equal.
+func (packet *IPPacket) Equals(other *IPPacket) bool {
+	if other == nil {
+		return false
+	}
+	if packet.TTL != other.TTL {
+		return false
+	}
+	if packet.Protocol != other.Protocol {
+		return false
+	}
+	if !reflect.DeepEqual(packet.Destination, other.Destination) {
+		return false
+	}
+	if !reflect.DeepEqual(packet.Source, other.Source) {
+		return false
+	}
+	return true
 }
 
 var fARP = ARP
