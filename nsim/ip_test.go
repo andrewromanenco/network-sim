@@ -40,7 +40,7 @@ func TestIPSendToExistingNode(t *testing.T) {
 		sentFrame = &frame
 		return nil
 	}
-	err := node.IPSend(ipPacket)
+	err := IPSend(node, ipPacket)
 	if err != nil {
 		t.Error("IPSend failed for no reason.")
 	}
@@ -55,7 +55,7 @@ func TestIPSendToNonExistingNodeFails(t *testing.T) {
 	fARP = func(node *Node, ip *net.IP) string {
 		return ""
 	}
-	err := node.IPSend(ipPacket)
+	err := IPSend(node, ipPacket)
 	if err != ErrNoRoute {
 		t.Error("IPSend must fail if no next hop is found.")
 	}
@@ -65,7 +65,7 @@ func TestIPSendPacketNoDestinationIPFails(t *testing.T) {
 	node := testIPNode(t)
 	ipPacket := testIPPacket()
 	ipPacket.Destination = nil
-	err := node.IPSend(ipPacket)
+	err := IPSend(node, ipPacket)
 	if err != ErrIPDestinationNotSet {
 		t.Error("IPSend must fail if packet has no destination ip.")
 	}

@@ -25,7 +25,7 @@ var fARP = ARP
 var fLinkSend = LinkSend
 
 // IPSend sends an IP packet.
-func (node *Node) IPSend(packet IPPacket) error {
+func IPSend(node *Node, packet IPPacket) error {
 	if packet.Destination == nil {
 		return ErrIPDestinationNotSet
 	}
