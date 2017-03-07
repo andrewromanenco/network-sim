@@ -79,6 +79,14 @@ func TestIPPacketEqualsWhenSame(t *testing.T) {
 	}
 }
 
+func TestIPPacketEqualsForDefault(t *testing.T) {
+	packet1 := IPPacket{}
+	packet2 := IPPacket{}
+	if !packet1.Equals(&packet2) {
+		t.Error("Equal packets must be equal.")
+	}
+}
+
 func TestIPPacketEqualsFalseForNil(t *testing.T) {
 	packet1 := testIPPacket()
 	if packet1.Equals(nil) {
