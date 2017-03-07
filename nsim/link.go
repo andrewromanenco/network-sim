@@ -17,6 +17,8 @@ type Frame struct {
 	IPPacket      IPPacket
 }
 
+var fIPReceive func(node *Node, ipPacket IPPacket)
+
 // LinkReceive is called when a node has an incoming frame. The receiver may
 // ignore the frame if it's not a target. This behaviour simulates ethernet network.
 // See package header comment for more info about MAC/IP addresses.
@@ -24,6 +26,7 @@ func LinkReceive(node *Node, frame Frame) bool {
 	targetIP := net.ParseIP(frame.destinationID)
 	for _, ni := range node.NetworkInterfaces {
 		if ni.IP.Equal(targetIP) {
+			fIPReceive(node, frame.IPPacket)
 			return true
 		}
 	}

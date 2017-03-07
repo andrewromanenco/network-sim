@@ -2,6 +2,10 @@ package nsim
 
 import "testing"
 
+func init() {
+	fIPReceive = func(node *Node, ipPacket IPPacket) {}
+}
+
 func TestDropFrameIfNotATarget(t *testing.T) {
 	node, _ := NewNodeBuilder().AddNetInterface("192.168.0.10/24").WithMedium(&dummyMedium{}).Build()
 	frame := Frame{"192.168.100.100", IPPacket{}}
