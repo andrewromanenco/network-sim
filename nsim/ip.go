@@ -24,6 +24,6 @@ var fARP = ARP
 func (node *Node) IPSend(packet IPPacket) error {
 	destinationMAC := fARP(node, &packet.Destination)
 	frame := Frame{destinationMAC, packet}
-	node.LinkSend(frame)
+	LinkSend(node, frame)
 	return nil
 }

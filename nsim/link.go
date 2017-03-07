@@ -20,7 +20,7 @@ type Frame struct {
 // LinkReceive is called when a node has an incoming frame. The receiver may
 // ignore the frame if it's not a target. This behaviour simulates ethernet network.
 // See package header comment for more info about MAC/IP addresses.
-func (node *Node) LinkReceive(frame Frame) bool {
+func LinkReceive(node *Node, frame Frame) bool {
 	targetIP := net.ParseIP(frame.destinationID)
 	for _, ni := range node.NetworkInterfaces {
 		if ni.IP.Equal(targetIP) {
@@ -31,6 +31,6 @@ func (node *Node) LinkReceive(frame Frame) bool {
 }
 
 // LinkSend sends a frame to the transmission medium.
-func (node *Node) LinkSend(frame Frame) error {
+func LinkSend(node *Node, frame Frame) error {
 	return node.Medium.send(frame)
 }

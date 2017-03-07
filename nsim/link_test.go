@@ -5,7 +5,7 @@ import "testing"
 func TestDropFrameIfNotATarget(t *testing.T) {
 	node, _ := NewNodeBuilder().AddNetInterface("192.168.0.10/24").WithMedium(&dummyMedium{}).Build()
 	frame := Frame{"192.168.100.100", IPPacket{}}
-	if node.LinkReceive(frame) {
+	if LinkReceive(node, frame) {
 		t.Error("Frame with other destination must be declined.")
 	}
 }
@@ -13,7 +13,7 @@ func TestDropFrameIfNotATarget(t *testing.T) {
 func TestAcceptFrameIfTarget(t *testing.T) {
 	node, _ := NewNodeBuilder().AddNetInterface("192.168.0.10/24").WithMedium(&dummyMedium{}).Build()
 	frame := Frame{"192.168.0.10", IPPacket{}}
-	if !node.LinkReceive(frame) {
+	if !LinkReceive(node, frame) {
 		t.Error("Frame must be accepted.")
 	}
 }
@@ -25,7 +25,7 @@ func TestAcceptFrameIfTargetWithMultipleIPs(t *testing.T) {
 		WithMedium(&dummyMedium{}).
 		Build()
 	frame := Frame{"192.168.0.10", IPPacket{}}
-	if !node.LinkReceive(frame) {
+	if !LinkReceive(node, frame) {
 		t.Error("Frame must be accepted.")
 	}
 }
@@ -44,7 +44,7 @@ func TestLinkSend(t *testing.T) {
 	node, _ := NewNodeBuilder().AddNetInterface("192.168.0.10/24").WithMedium(medium).Build()
 	frame := Frame{"192.168.0.10", IPPacket{}}
 	frame.IPPacket.TTL = 999
-	node.LinkSend(frame)
+	LinkSend(node, frame)
 	acceptedFrame := *medium.acceptedFrame
 	if acceptedFrame.destinationID != frame.destinationID {
 		t.Error("Frame sent does not contained passed destination id.")
