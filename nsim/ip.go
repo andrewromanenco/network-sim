@@ -58,3 +58,7 @@ func IPSend(node *Node, packet IPPacket) error {
 	fLinkSend(node, frame)
 	return nil
 }
+
+func isRouter(node *Node) bool {
+	return len(node.NetworkInterfaces) > 1
+}

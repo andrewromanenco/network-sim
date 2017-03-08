@@ -129,3 +129,18 @@ func TestIPPacketNotEqualProtocol(t *testing.T) {
 		t.Error("Packets are different.")
 	}
 }
+
+func TestIsNotARouterIfOneInterfaceOnly(t *testing.T) {
+	node := testIPNode(t)
+	node.NetworkInterfaces = node.NetworkInterfaces[:len(node.NetworkInterfaces)-1]
+	if isRouter(node) {
+		t.Error("Node with one net interface can not be a router")
+	}
+}
+
+func TestIsARouterIfSeveralInterfaces(t *testing.T) {
+	node := testIPNode(t)
+	if !isRouter(node) {
+		t.Error("Node with multiple net interfaces mut be a router")
+	}
+}
