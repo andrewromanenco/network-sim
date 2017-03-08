@@ -3,7 +3,6 @@ package nsim
 import (
 	"errors"
 	"net"
-	"reflect"
 )
 
 var (
@@ -33,10 +32,10 @@ func (packet *IPPacket) Equals(other *IPPacket) bool {
 	if packet.Protocol != other.Protocol {
 		return false
 	}
-	if !reflect.DeepEqual(packet.Destination, other.Destination) {
+	if !packet.Destination.Equal(other.Destination) {
 		return false
 	}
-	if !reflect.DeepEqual(packet.Source, other.Source) {
+	if !packet.Source.Equal(other.Source) {
 		return false
 	}
 	return true
