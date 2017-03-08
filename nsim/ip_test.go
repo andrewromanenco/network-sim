@@ -144,3 +144,19 @@ func TestIsARouterIfSeveralInterfaces(t *testing.T) {
 		t.Error("Node with multiple net interfaces mut be a router")
 	}
 }
+
+func TestNodeOwnsIP(t *testing.T) {
+	node := testIPNode(t)
+	ip := net.ParseIP("192.168.1.1")
+	if !nodeOwnsIP(node, &ip) {
+		t.Error("Must return true as node has this ip.")
+	}
+}
+
+func TestNodeNotOwnsIP(t *testing.T) {
+	node := testIPNode(t)
+	ip := net.ParseIP("192.168.100.100")
+	if nodeOwnsIP(node, &ip) {
+		t.Error("Must return false for unknown ip.")
+	}
+}

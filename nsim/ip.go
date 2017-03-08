@@ -62,3 +62,12 @@ func IPSend(node *Node, packet IPPacket) error {
 func isRouter(node *Node) bool {
 	return len(node.NetworkInterfaces) > 1
 }
+
+func nodeOwnsIP(node *Node, ip *net.IP) bool {
+	for _, ni := range node.NetworkInterfaces {
+		if ni.IP.Equal(*ip) {
+			return true
+		}
+	}
+	return false
+}
