@@ -160,3 +160,20 @@ func TestNodeNotOwnsIP(t *testing.T) {
 		t.Error("Must return false for unknown ip.")
 	}
 }
+
+func TestForwardPacketReducesTTL(t *testing.T) {
+	var forwarded IPPacket
+	fIPSend = func(node *Node, packet IPPacket) error {
+		forwarded = packet
+		return nil
+	}
+	node := testIPNode(t)
+	packet := testIPPacket()
+	forwardPacket(node, &packet)
+	if packet.TTL != 9 {
+		t.Error("Forwarding must reduce TTL by one.")
+	}
+	if !packet.Equals(&forwarded) {
+		t.Error("Packets must be equal.")
+	}
+}

@@ -43,6 +43,7 @@ func (packet *IPPacket) Equals(other *IPPacket) bool {
 
 var fARP = ARP
 var fLinkSend = LinkSend
+var fIPSend = IPSend
 
 // IPSend sends an IP packet.
 func IPSend(node *Node, packet IPPacket) error {
@@ -69,4 +70,9 @@ func nodeOwnsIP(node *Node, ip *net.IP) bool {
 		}
 	}
 	return false
+}
+
+func forwardPacket(node *Node, packet *IPPacket) {
+	packet.TTL--
+	fIPSend(node, *packet)
 }
