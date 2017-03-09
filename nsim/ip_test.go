@@ -130,50 +130,21 @@ func TestIPPacketNotEqualProtocol(t *testing.T) {
 	}
 }
 
-func TestIsNotARouterIfOneInterfaceOnly(t *testing.T) {
-	node := testIPNode(t)
-	node.NetworkInterfaces = node.NetworkInterfaces[:len(node.NetworkInterfaces)-1]
-	if isRouter(node) {
-		t.Error("Node with one net interface can not be a router")
-	}
-}
-
-func TestIsARouterIfSeveralInterfaces(t *testing.T) {
-	node := testIPNode(t)
-	if !isRouter(node) {
-		t.Error("Node with multiple net interfaces mut be a router")
-	}
-}
-
-func TestNodeOwnsIP(t *testing.T) {
-	node := testIPNode(t)
-	ip := net.ParseIP("192.168.1.1")
-	if !nodeOwnsIP(node, &ip) {
-		t.Error("Must return true as node has this ip.")
-	}
-}
-
-func TestNodeNotOwnsIP(t *testing.T) {
-	node := testIPNode(t)
-	ip := net.ParseIP("192.168.100.100")
-	if nodeOwnsIP(node, &ip) {
-		t.Error("Must return false for unknown ip.")
-	}
-}
-
-func TestForwardPacketReducesTTL(t *testing.T) {
-	var forwarded IPPacket
+func TestIPReceiveForwardsPacketIfRouter(t *testing.T) {
+	var forwardedPacket IPPacket
+	forwarded := false
 	fIPSend = func(node *Node, packet IPPacket) error {
-		forwarded = packet
+		forwarded = true
+		forwardedPacket = packet
 		return nil
 	}
 	node := testIPNode(t)
 	packet := testIPPacket()
-	forwardPacket(node, &packet)
-	if packet.TTL != 9 {
-		t.Error("Forwarding must reduce TTL by one.")
+	IPReceive(node, packet)
+	if !forwarded {
+		t.Error("Packet was not forwarded.")
 	}
-	if !packet.Equals(&forwarded) {
-		t.Error("Packets must be equal.")
+	if forwardedPacket.TTL != packet.TTL-1 {
+		t.Error("Forwarded packet must have decreased TTL.")
 	}
 }

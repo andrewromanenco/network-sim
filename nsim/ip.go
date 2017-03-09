@@ -59,20 +59,8 @@ func IPSend(node *Node, packet IPPacket) error {
 	return nil
 }
 
-func isRouter(node *Node) bool {
-	return len(node.NetworkInterfaces) > 1
-}
-
-func nodeOwnsIP(node *Node, ip *net.IP) bool {
-	for _, ni := range node.NetworkInterfaces {
-		if ni.IP.Equal(*ip) {
-			return true
-		}
-	}
-	return false
-}
-
-func forwardPacket(node *Node, packet *IPPacket) {
+// IPReceive is called when an IP packet arrives from lower layer.
+func IPReceive(node *Node, packet IPPacket) {
 	packet.TTL--
-	fIPSend(node, *packet)
+	fIPSend(node, packet)
 }
