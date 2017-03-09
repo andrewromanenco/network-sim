@@ -61,6 +61,9 @@ func IPSend(node *Node, packet IPPacket) error {
 
 // IPReceive is called when an IP packet arrives from lower layer.
 func IPReceive(node *Node, packet IPPacket) {
+	if len(node.NetworkInterfaces) == 1 {
+		return
+	}
 	packet.TTL--
 	fIPSend(node, packet)
 }

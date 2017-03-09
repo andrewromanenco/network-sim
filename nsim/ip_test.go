@@ -148,3 +148,18 @@ func TestIPReceiveForwardsPacketIfRouter(t *testing.T) {
 		t.Error("Forwarded packet must have decreased TTL.")
 	}
 }
+
+func TestIPReceiveNoForwardingIfNotARouter(t *testing.T) {
+	forwarded := false
+	fIPSend = func(node *Node, packet IPPacket) error {
+		forwarded = true
+		return nil
+	}
+	node := testIPNode(t)
+	node.NetworkInterfaces = node.NetworkInterfaces[:1]
+	packet := testIPPacket()
+	IPReceive(node, packet)
+	if forwarded {
+		t.Error("Packet should not be forwarded if not a router.")
+	}
+}
