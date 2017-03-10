@@ -13,32 +13,35 @@ var (
 	ErrNoRoute = errors.New("No route to destinaton.")
 )
 
-// IPPacket is a packet routed over an IP network.
-type IPPacket struct {
-	Destination net.IP
-	Source      net.IP
-	TTL         int
-	Protocol    string
+// IPPacket represent a packet on IP layer of TCP/IP stack.
+type IPPacket interface {
+	Destination() net.IP
+	Source() net.IP
+	TTL() int
+	Protocol() string
 }
 
-// Equals tests if two packets are equal.
-func (packet *IPPacket) Equals(other *IPPacket) bool {
-	if other == nil {
-		return false
-	}
-	if packet.TTL != other.TTL {
-		return false
-	}
-	if packet.Protocol != other.Protocol {
-		return false
-	}
-	if !packet.Destination.Equal(other.Destination) {
-		return false
-	}
-	if !packet.Source.Equal(other.Source) {
-		return false
-	}
-	return true
+type ipPacket struct {
+	destination net.IP
+	source      net.IP
+	ttl         int
+	protocol    string
+}
+
+func (ipp *ipPacket) Destination() net.IP {
+	return ipp.destination
+}
+
+func (ipp *ipPacket) Source() net.IP {
+	return ipp.source
+}
+
+func (ipp *ipPacket) TTL() int {
+	return ipp.ttl
+}
+
+func (ipp *ipPacket) Protocol() string {
+	return ipp.protocol
 }
 
 var fARP = ARP
@@ -46,11 +49,11 @@ var fLinkSend = LinkSend
 var fIPSend = IPSend
 
 // IPSend sends an IP packet.
-func IPSend(node *Node, packet IPPacket) error {
+func IPSend(node Node, packet IPPacket) error {
 	if packet.Destination == nil {
 		return ErrIPDestinationNotSet
 	}
-	destinationMAC := fARP(node, &packet.Destination)
+	destinationMAC := fARP(node, packet.Destination())
 	if destinationMAC == "" {
 		return ErrNoRoute
 	}
@@ -60,10 +63,10 @@ func IPSend(node *Node, packet IPPacket) error {
 }
 
 // IPReceive is called when an IP packet arrives from lower layer.
-func IPReceive(node *Node, packet IPPacket) {
-	if len(node.NetworkInterfaces) == 1 {
+func IPReceive(node Node, packet IPPacket) {
+	if len(node.NetworkInterfaces()) == 1 {
 		return
 	}
-	packet.TTL--
+	//packet.TTL--
 	fIPSend(node, packet)
 }
