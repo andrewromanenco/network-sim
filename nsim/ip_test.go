@@ -5,28 +5,6 @@ import (
 	"testing"
 )
 
-// func testIPNode(t *testing.T) *Node {
-// 	node, err := NewNodeBuilder().
-// 		AddNetInterface("192.168.1.1/24").
-// 		AddNetInterface("192.168.2.2/24").
-// 		WithMedium(&dummyMedium{}).
-// 		Build()
-// 	if err != nil {
-// 		t.Error("Test Node for IP was not created.")
-// 	}
-// 	node.AddRoute("192.168.3.0/24", "192.168.1.100")
-// 	return node
-// }
-
-// func testIPPacket() IPPacket {
-// 	return IPPacket{
-// 		net.ParseIP("192.168.0.1"),
-// 		net.ParseIP("192.168.0.2"),
-// 		10,
-// 		"None",
-// 	}
-// }
-
 func mockARP(node Node, ip net.IP) string {
 	return "dest-mack"
 }
@@ -34,6 +12,7 @@ func mockARP(node Node, ip net.IP) string {
 func TestIPSendToExistingNode(t *testing.T) {
 	node := NewMockNode(t)
 	ipPacket := NewMockIPPacket(t)
+	ipPacket.FDestination = func() net.IP { return net.ParseIP("192.168.0.1") }
 	fARP = mockARP
 	var sentFrame *Frame
 	fLinkSend = func(node Node, frame Frame) error {
@@ -52,6 +31,7 @@ func TestIPSendToExistingNode(t *testing.T) {
 func TestIPSendToNonExistingNodeFails(t *testing.T) {
 	node := NewMockNode(t)
 	ipPacket := NewMockIPPacket(t)
+	ipPacket.FDestination = func() net.IP { return net.ParseIP("192.168.0.1") }
 	fARP = func(node Node, ip net.IP) string {
 		return ""
 	}
@@ -64,7 +44,7 @@ func TestIPSendToNonExistingNodeFails(t *testing.T) {
 func TestIPSendPacketNoDestinationIPFails(t *testing.T) {
 	node := NewMockNode(t)
 	ipPacket := NewMockIPPacket(t)
-	//ipPacket.Destination = nil
+	ipPacket.FDestination = func() net.IP { return nil }
 	err := IPSend(node, ipPacket)
 	if err != ErrIPDestinationNotSet {
 		t.Error("IPSend must fail if packet has no destination ip.")
@@ -80,7 +60,14 @@ func TestIPReceiveForwardsPacketIfRouter(t *testing.T) {
 		return nil
 	}
 	node := NewMockNode(t)
+	node.FNetworkInterfaces = func() []NetworkInterface {
+		return []NetworkInterface{
+			*ParseNetworkInterface("192.168.1.1/24"),
+			*ParseNetworkInterface("192.168.2.2/24"),
+		}
+	}
 	packet := NewMockIPPacket(t)
+	packet.FTTL = func() int { return 10 }
 	IPReceive(node, packet)
 	if !forwarded {
 		t.Error("Packet was not forwarded.")
@@ -97,7 +84,11 @@ func TestIPReceiveNoForwardingIfNotARouter(t *testing.T) {
 		return nil
 	}
 	node := NewMockNode(t)
-	//node.NetworkInterfaces = node.NetworkInterfaces[:1]
+	node.FNetworkInterfaces = func() []NetworkInterface {
+		return []NetworkInterface{
+			*ParseNetworkInterface("192.168.1.1/24"),
+		}
+	}
 	packet := NewMockIPPacket(t)
 	IPReceive(node, packet)
 	if forwarded {

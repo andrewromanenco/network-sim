@@ -9,8 +9,8 @@ func init() {
 }
 
 func TestDropFrameIfNotATarget(t *testing.T) {
-	//node, _ := NewNodeBuilder().AddNetInterface("192.168.0.10/24").WithMedium(&dummyMedium{}).Build()
 	node := NewMockNode(t)
+	node.FNetworkInterfaces = func() []NetworkInterface { return []NetworkInterface{*ParseNetworkInterface("192.168.0.10/24")} }
 	frame := Frame{"192.168.100.100", NewMockIPPacket(t)}
 	if LinkReceive(node, frame) {
 		t.Error("Frame with other destination must be declined.")
@@ -18,8 +18,8 @@ func TestDropFrameIfNotATarget(t *testing.T) {
 }
 
 func TestAcceptFrameIfTarget(t *testing.T) {
-	//node, _ := NewNodeBuilder().AddNetInterface("192.168.0.10/24").WithMedium(&dummyMedium{}).Build()
 	node := NewMockNode(t)
+	node.FNetworkInterfaces = func() []NetworkInterface { return []NetworkInterface{*ParseNetworkInterface("192.168.0.10/24")} }
 	frame := Frame{"192.168.0.10", NewMockIPPacket(t)}
 	if !LinkReceive(node, frame) {
 		t.Error("Frame must be accepted.")
@@ -27,12 +27,13 @@ func TestAcceptFrameIfTarget(t *testing.T) {
 }
 
 func TestAcceptFrameIfTargetWithMultipleIPs(t *testing.T) {
-	// node, _ := NewNodeBuilder().
-	// 	AddNetInterface("192.168.0.10/24").
-	// 	AddNetInterface("192.168.1.10/24").
-	// 	WithMedium(&dummyMedium{}).
-	// 	Build()
 	node := NewMockNode(t)
+	node.FNetworkInterfaces = func() []NetworkInterface {
+		return []NetworkInterface{
+			*ParseNetworkInterface("192.168.0.10/24"),
+			*ParseNetworkInterface("192.168.1.10/24"),
+		}
+	}
 	frame := Frame{"192.168.0.10", NewMockIPPacket(t)}
 	if !LinkReceive(node, frame) {
 		t.Error("Frame must be accepted.")
@@ -43,18 +44,18 @@ type mockMedium struct {
 	acceptedFrame *Frame
 }
 
-func (m *mockMedium) send(frame Frame) error {
+func (m *mockMedium) Send(frame Frame) error {
 	m.acceptedFrame = &frame
 	return nil
 }
 
 func TestLinkSend(t *testing.T) {
 	medium := &mockMedium{nil}
-	// node, _ := NewNodeBuilder().AddNetInterface("192.168.0.10/24").WithMedium(medium).Build()
-	// frame := Frame{"192.168.0.10", IPPacket{}}
 	node := NewMockNode(t)
-	frame := Frame{"192.168.0.10", NewMockIPPacket(t)}
-	//frame.IPPacket.TTL = 999
+	node.FMedium = func() TransmissionMedium { return medium }
+	mPacket := NewMockIPPacket(t)
+	mPacket.FTTL = func() int { return 999 }
+	frame := Frame{"192.168.0.10", mPacket}
 	LinkSend(node, frame)
 	acceptedFrame := *medium.acceptedFrame
 	if acceptedFrame.destinationID != frame.destinationID {

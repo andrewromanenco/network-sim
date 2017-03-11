@@ -50,7 +50,7 @@ var fIPSend = IPSend
 
 // IPSend sends an IP packet.
 func IPSend(node Node, packet IPPacket) error {
-	if packet.Destination == nil {
+	if packet.Destination() == nil {
 		return ErrIPDestinationNotSet
 	}
 	destinationMAC := fARP(node, packet.Destination())

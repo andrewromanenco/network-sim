@@ -12,7 +12,7 @@ func (dm *dummyMedium) send(frame Frame) error {
 	return nil
 }
 
-func NewMockNode(t *testing.T) Node {
+func NewMockNode(t *testing.T) *MockNode {
 	return &MockNode{t, nil, nil, nil}
 }
 
