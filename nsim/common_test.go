@@ -48,7 +48,7 @@ func (mn *MockNode) RoutingTable() []Route {
 }
 
 func NewMockIPPacket(t *testing.T) *MockIPPacket {
-	return &MockIPPacket{t, nil, nil, nil, nil}
+	return &MockIPPacket{t, nil, nil, nil, nil, nil}
 }
 
 type MockIPPacket struct {
@@ -57,6 +57,7 @@ type MockIPPacket struct {
 	FSource      func() net.IP
 	FTTL         func() int
 	FProtocol    func() string
+	FDecreaseTTL func()
 }
 
 func (mip *MockIPPacket) Destination() net.IP {
@@ -89,4 +90,11 @@ func (mip *MockIPPacket) Protocol() string {
 		return ""
 	}
 	return mip.FProtocol()
+}
+
+func (mip *MockIPPacket) DecreaseTTL() {
+	if mip.FDecreaseTTL == nil {
+		mip.T.Error("DecreaseTTL is not implemented.")
+	}
+	mip.FDecreaseTTL()
 }

@@ -68,11 +68,13 @@ func TestIPReceiveForwardsPacketIfRouter(t *testing.T) {
 	}
 	packet := NewMockIPPacket(t)
 	packet.FTTL = func() int { return 10 }
+	decreased := false
+	packet.FDecreaseTTL = func() { decreased = true }
 	IPReceive(node, packet)
 	if !forwarded {
 		t.Error("Packet was not forwarded.")
 	}
-	if forwardedPacket.TTL() != packet.TTL()-1 {
+	if !decreased {
 		t.Error("Forwarded packet must have decreased TTL.")
 	}
 }

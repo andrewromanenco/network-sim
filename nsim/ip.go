@@ -19,6 +19,7 @@ type IPPacket interface {
 	Source() net.IP
 	TTL() int
 	Protocol() string
+	DecreaseTTL()
 }
 
 type ipPacket struct {
@@ -44,6 +45,10 @@ func (ipp *ipPacket) Protocol() string {
 	return ipp.protocol
 }
 
+func (ipp *ipPacket) DecreaseTTL() {
+	ipp.ttl--
+}
+
 var fARP = ARP
 var fLinkSend = LinkSend
 var fIPSend = IPSend
@@ -67,6 +72,6 @@ func IPReceive(node Node, packet IPPacket) {
 	if len(node.NetworkInterfaces()) == 1 {
 		return
 	}
-	//packet.TTL--
+	packet.DecreaseTTL()
 	fIPSend(node, packet)
 }
