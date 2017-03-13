@@ -75,3 +75,22 @@ func IPReceive(node Node, packet IPPacket) {
 	packet.DecreaseTTL()
 	fIPSend(node, packet)
 }
+
+// ProtocolHandler is a protocl handler on top of IP layer.
+type ProtocolHandler func(IPPacket)
+
+var protocolHandlers = make(map[string]ProtocolHandler)
+
+// RegisterProtocolHandler registers a protocol handler on top of IP layer.
+func RegisterProtocolHandler(protocol string, handler ProtocolHandler) {
+	protocolHandlers[protocol] = handler
+}
+
+// UnregisterProtocolHandler unregisters a protocol handler on top of IP layer.
+func UnregisterProtocolHandler(protocol string) ProtocolHandler {
+	if handler, ok := protocolHandlers[protocol]; ok {
+		delete(protocolHandlers, protocol)
+		return handler
+	}
+	return nil
+}

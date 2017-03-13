@@ -97,3 +97,20 @@ func TestIPReceiveNoForwardingIfNotARouter(t *testing.T) {
 		t.Error("Packet should not be forwarded if not a router.")
 	}
 }
+
+func TestRegisterProtocolHandler(t *testing.T) {
+	count := 0
+	var handler ProtocolHandler = func(p IPPacket) { count++ }
+	RegisterProtocolHandler("some-protocol", handler)
+	result := UnregisterProtocolHandler("some-protocol")
+	result(nil)
+	if count != 1 {
+		t.Error("Register must set handler, and unregister must return it.")
+	}
+}
+
+func TestUnregisterProtocolHandler(t *testing.T) {
+	if UnregisterProtocolHandler("nothing") != nil {
+		t.Error("Must be nil for non existing handler.")
+	}
+}
