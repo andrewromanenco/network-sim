@@ -71,7 +71,7 @@ func IPSend(node Node, packet IPPacket) error {
 func IPReceive(node Node, packet IPPacket) {
 	if packetForNode(node, packet) {
 		if handler, ok := protocolHandlers[packet.Protocol()]; ok {
-			handler(packet)
+			handler(node, packet)
 		}
 		return
 	}
@@ -96,7 +96,7 @@ func packetForNode(node Node, packet IPPacket) bool {
 }
 
 // ProtocolHandler is a protocl handler on top of IP layer.
-type ProtocolHandler func(IPPacket)
+type ProtocolHandler func(Node, IPPacket)
 
 var protocolHandlers = make(map[string]ProtocolHandler)
 

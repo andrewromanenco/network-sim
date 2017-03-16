@@ -117,7 +117,7 @@ func TestIPReceiveCallsProtocolHandlerWhenNodeIsDestination(t *testing.T) {
 	packet.FDestination = func() net.IP { return net.ParseIP("192.168.1.1") }
 	packet.FProtocol = func() string { return "some-protocol" }
 	handled := false
-	RegisterProtocolHandler("some-protocol", func(p IPPacket) { handled = true })
+	RegisterProtocolHandler("some-protocol", func(n Node, p IPPacket) { handled = true })
 	IPReceive(node, packet)
 	if forwarded {
 		t.Error("Packet should not be forwarded, as it's destination is the node.")
@@ -129,10 +129,10 @@ func TestIPReceiveCallsProtocolHandlerWhenNodeIsDestination(t *testing.T) {
 
 func TestRegisterProtocolHandler(t *testing.T) {
 	count := 0
-	var handler ProtocolHandler = func(p IPPacket) { count++ }
+	var handler ProtocolHandler = func(n Node, p IPPacket) { count++ }
 	RegisterProtocolHandler("some-protocol", handler)
 	result := UnregisterProtocolHandler("some-protocol")
-	result(nil)
+	result(nil, nil)
 	if count != 1 {
 		t.Error("Register must set handler, and unregister must return it.")
 	}
