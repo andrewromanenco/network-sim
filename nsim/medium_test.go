@@ -60,3 +60,26 @@ func TestProcessFrame(t *testing.T) {
 		t.Error("Should be false as no more frames to process.")
 	}
 }
+
+func TestGetFrame(t *testing.T) {
+	testee := NewSignleQueueMedium()
+	if testee.Frame() != nil {
+		t.Error("Must be nil as no frames available.")
+	}
+	testee.Send(Frame{"mac1", nil})
+	if testee.Frame() == nil {
+		t.Error("Must not be nil.")
+	}
+	testee.Send(Frame{"mac2", nil})
+	if testee.Frame().destinationID != "mac1" {
+		t.Error("First unprocessed frame must be returned.")
+	}
+	testee.DeliverFrame()
+	if testee.Frame().destinationID != "mac2" {
+		t.Error("Second must be available after first is processed.")
+	}
+	testee.DeliverFrame()
+	if testee.Frame() != nil {
+		t.Error("Should be none.")
+	}
+}

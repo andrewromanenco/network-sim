@@ -69,3 +69,11 @@ func (m *SingleQueueMedium) processFrame(frame *Frame) {
 func (m *SingleQueueMedium) HasMore() bool {
 	return m.head != nil
 }
+
+// Frame returns next frame to be processed.
+func (m *SingleQueueMedium) Frame() *Frame {
+	if m.head == nil {
+		return nil
+	}
+	return m.head.frame
+}
