@@ -35,3 +35,27 @@ func TestParseNetworkInterfaceFails(t *testing.T) {
 		t.Error("Expected to fail.")
 	}
 }
+
+func TestIPPacketBuilder(t *testing.T) {
+	packet := NewIPPacketBuilder().
+		Destination("192.168.1.1").
+		Source("192.168.2.2").
+		TTL(10).
+		Protocol("some-protocol").
+		Build()
+	if packet == nil {
+		t.Error("Should not be nil for correct config.")
+	}
+	if !packet.Destination().Equal(net.ParseIP("192.168.1.1")) {
+		t.Error("Destination was not set correctly.")
+	}
+	if !packet.Source().Equal(net.ParseIP("192.168.2.2")) {
+		t.Error("Source was not set correctly.")
+	}
+	if packet.TTL() != 10 {
+		t.Error("TTL was not set correctly.")
+	}
+	if packet.Protocol() != "some-protocol" {
+		t.Error("Protocol was not set correctly.")
+	}
+}
