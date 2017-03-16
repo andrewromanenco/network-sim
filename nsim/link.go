@@ -18,6 +18,7 @@ type Frame struct {
 }
 
 var fIPReceive func(node Node, ipPacket IPPacket)
+var fLinkReceive = LinkReceive
 
 // LinkReceive is called when a node has an incoming frame. The receiver may
 // ignore the frame if it's not a target. This behaviour simulates ethernet network.
