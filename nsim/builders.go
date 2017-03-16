@@ -30,9 +30,21 @@ func (ipb *IPPacketBuilder) Destination(ip string) *IPPacketBuilder {
 	return ipb
 }
 
+// DestinationIP sets destination for packet to be created.
+func (ipb *IPPacketBuilder) DestinationIP(ip net.IP) *IPPacketBuilder {
+	ipb.destination = ip
+	return ipb
+}
+
 // Source sets source for packet to be created.
 func (ipb *IPPacketBuilder) Source(ip string) *IPPacketBuilder {
 	ipb.source = net.ParseIP(ip)
+	return ipb
+}
+
+// SourceIP sets source for packet to be created.
+func (ipb *IPPacketBuilder) SourceIP(ip net.IP) *IPPacketBuilder {
+	ipb.source = ip
 	return ipb
 }
 
