@@ -75,11 +75,15 @@ func IPReceive(node Node, packet IPPacket) {
 		}
 		return
 	}
-	if len(node.NetworkInterfaces()) == 1 {
+	if !isRouter(node) {
 		return
 	}
 	packet.DecreaseTTL()
 	fIPSend(node, packet)
+}
+
+func isRouter(node Node) bool {
+	return len(node.NetworkInterfaces()) > 1
 }
 
 func packetForNode(node Node, packet IPPacket) bool {
