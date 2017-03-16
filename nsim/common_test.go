@@ -8,7 +8,7 @@ import (
 type dummyMedium struct {
 }
 
-func (dm *dummyMedium) send(frame Frame) error {
+func (dm *dummyMedium) Send(frame Frame) error {
 	return nil
 }
 
