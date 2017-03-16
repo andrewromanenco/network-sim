@@ -2,6 +2,18 @@ package nsim
 
 import "testing"
 
+func TestRegisterNode(t *testing.T) {
+	testee := NewSignleQueueMedium()
+	node := NewMockNode(t)
+	node.FNetworkInterfaces = func() []NetworkInterface {
+		return []NetworkInterface{
+			*ParseNetworkInterface("192.168.1.1/24"),
+			*ParseNetworkInterface("192.168.2.2/24"),
+		}
+	}
+	testee.RegisterNode(node)
+}
+
 func TestHasMore(t *testing.T) {
 	testee := NewSignleQueueMedium()
 	if testee.HasMore() {
