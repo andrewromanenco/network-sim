@@ -40,3 +40,21 @@ type Route struct {
 	DestinationIP net.IP
 	Network       net.IPNet
 }
+
+func (ni *NetworkInterface) Equal(other *NetworkInterface) bool {
+	if other == nil {
+		return false
+	}
+	if !ni.IP.Equal(other.IP) {
+		return false
+	}
+	if !ni.Network.IP.Equal(other.Network.IP) {
+		return false
+	}
+	thisSize, _ := ni.Network.Mask.Size()
+	thatSize, _ := other.Network.Mask.Size()
+	if thisSize != thatSize {
+		return false
+	}
+	return true
+}
