@@ -68,6 +68,7 @@ func TestIPReceiveForwardsPacketIfRouter(t *testing.T) {
 	}
 	packet := NewMockIPPacket(t)
 	packet.FTTL = func() int { return 10 }
+	packet.FDestination = func() net.IP { return net.ParseIP("192.168.10.10") }
 	decreased := false
 	packet.FDecreaseTTL = func() { decreased = true }
 	IPReceive(node, packet)
@@ -92,9 +93,37 @@ func TestIPReceiveNoForwardingIfNotARouter(t *testing.T) {
 		}
 	}
 	packet := NewMockIPPacket(t)
+	packet.FDestination = func() net.IP { return net.ParseIP("192.168.10.10") }
 	IPReceive(node, packet)
 	if forwarded {
 		t.Error("Packet should not be forwarded if not a router.")
+	}
+}
+
+func TestIPReceiveCallsProtocolHandlerWhenNodeIsDestination(t *testing.T) {
+	forwarded := false
+	fIPSend = func(node Node, packet IPPacket) error {
+		forwarded = true
+		return nil
+	}
+	node := NewMockNode(t)
+	node.FNetworkInterfaces = func() []NetworkInterface {
+		return []NetworkInterface{
+			*ParseNetworkInterface("192.168.1.1/24"),
+			*ParseNetworkInterface("192.168.2.2/24"),
+		}
+	}
+	packet := NewMockIPPacket(t)
+	packet.FDestination = func() net.IP { return net.ParseIP("192.168.1.1") }
+	packet.FProtocol = func() string { return "some-protocol" }
+	handled := false
+	RegisterProtocolHandler("some-protocol", func(p IPPacket) { handled = true })
+	IPReceive(node, packet)
+	if forwarded {
+		t.Error("Packet should not be forwarded, as it's destination is the node.")
+	}
+	if !handled {
+		t.Error("Packet must be handled by protocol handler.")
 	}
 }
 

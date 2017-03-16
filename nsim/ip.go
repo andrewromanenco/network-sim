@@ -69,11 +69,26 @@ func IPSend(node Node, packet IPPacket) error {
 
 // IPReceive is called when an IP packet arrives from lower layer.
 func IPReceive(node Node, packet IPPacket) {
+	if packetForNode(node, packet) {
+		if handler, ok := protocolHandlers[packet.Protocol()]; ok {
+			handler(packet)
+		}
+		return
+	}
 	if len(node.NetworkInterfaces()) == 1 {
 		return
 	}
 	packet.DecreaseTTL()
 	fIPSend(node, packet)
+}
+
+func packetForNode(node Node, packet IPPacket) bool {
+	for _, ni := range node.NetworkInterfaces() {
+		if ni.IP.Equal(packet.Destination()) {
+			return true
+		}
+	}
+	return false
 }
 
 // ProtocolHandler is a protocl handler on top of IP layer.
