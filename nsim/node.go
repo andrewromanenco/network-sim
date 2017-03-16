@@ -41,6 +41,7 @@ type Route struct {
 	Network       net.IPNet
 }
 
+// Equal checks if two net interfaces are equal.
 func (ni *NetworkInterface) Equal(other *NetworkInterface) bool {
 	if other == nil {
 		return false
@@ -52,6 +53,25 @@ func (ni *NetworkInterface) Equal(other *NetworkInterface) bool {
 		return false
 	}
 	thisSize, _ := ni.Network.Mask.Size()
+	thatSize, _ := other.Network.Mask.Size()
+	if thisSize != thatSize {
+		return false
+	}
+	return true
+}
+
+// Equal checks if two routes are equal.
+func (r *Route) Equal(other *Route) bool {
+	if other == nil {
+		return false
+	}
+	if !r.DestinationIP.Equal(other.DestinationIP) {
+		return false
+	}
+	if !r.Network.IP.Equal(other.Network.IP) {
+		return false
+	}
+	thisSize, _ := r.Network.Mask.Size()
 	thatSize, _ := other.Network.Mask.Size()
 	if thisSize != thatSize {
 		return false
