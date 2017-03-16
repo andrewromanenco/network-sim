@@ -20,6 +20,11 @@ type icmp struct {
 	messageType string
 }
 
+// NewICMPPacket creates new icmp packet.
+func NewICMPPacket(ippacket IPPacket, messageType string) ICMPPacket {
+	return &icmp{ippacket, messageType}
+}
+
 // MessageType returns message type for an icmp packet.
 func (ic *icmp) MessageType() string {
 	return ic.messageType

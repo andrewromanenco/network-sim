@@ -48,3 +48,23 @@ func TestICMPEcho(t *testing.T) {
 		t.Error("Echo reply is expected.")
 	}
 }
+
+func TestNewICMPPacket(t *testing.T) {
+	ipPacket := NewMockIPPacket(t)
+	icmpPacket := NewICMPPacket(ipPacket, "msg-type")
+	if icmpPacket == nil {
+		t.Error("Must not be nil.")
+		return
+	}
+	if icmpPacket.MessageType() != "msg-type" {
+		t.Error("ICMP type is not correct.")
+	}
+	icmpStruct, ok := icmpPacket.(*icmp)
+	if !ok {
+		t.Error("icmp struct is expeced.")
+		return
+	}
+	if icmpStruct.IPPacket != ipPacket {
+		t.Error("IPPacket was not set.")
+	}
+}
