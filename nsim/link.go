@@ -17,7 +17,7 @@ type Frame struct {
 	IPPacket      IPPacket
 }
 
-var fIPReceive func(node Node, ipPacket IPPacket)
+var fIPReceive = IPReceive
 var fLinkReceive = LinkReceive
 
 // LinkReceive is called when a node has an incoming frame. The receiver may
